@@ -1,50 +1,71 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\ProdiController;
-use App\Http\Controllers\RuanganController;
-use App\Http\Controllers\EventController;
-use App\Http\Controllers\PresensiController;
+use App\Http\Controllers\{
+    AuthController,
+    ProdiController,
+    RuanganController,
+    EventController,
+    DashboardController,
+    ApprovalController,
+    ReportController,
+    ProfileController
+};
 
-// Halaman utama bawaan Laravel
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', fn() => view('welcome'));
 
-// --- GROUP GUEST (Hanya bisa diakses jika BELUM login) ---
+// GUEST ZONE
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->name('login.process');
 });
 
-// --- GROUP AUTH (Hanya bisa diakses jika SUDAH sukses login) ---
+// AUTH ZONE
 Route::middleware('auth')->group(function () {
-    
-    // Fitur Keluar Aplikasi
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    
+    Route::controller(ProfileController::class)->group(function () {
+        Route::get('/profile', 'edit')->name('profile.edit');
+        Route::put('/profile', 'update')->name('profile.update');
+    });
 
-    // Route Master Prodi
-    Route::get('/prodi', [ProdiController::class, 'index'])->name('prodi.index');
-    Route::post('/prodi', [ProdiController::class, 'store'])->name('prodi.store');
-    Route::get('/prodi/{id}/edit', [ProdiController::class, 'edit'])->name('prodi.edit');
-    Route::put('/prodi/{id}', [ProdiController::class, 'update'])->name('prodi.update');
-    Route::delete('/prodi/{id}', [ProdiController::class, 'destroy'])->name('prodi.destroy');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Route Master Ruangan
-    Route::get('/ruangan', [RuanganController::class, 'index'])->name('ruangan.index');
-    Route::post('/ruangan', [RuanganController::class, 'store'])->name('ruangan.store');
-    Route::get('/ruangan/{id}/edit', [RuanganController::class, 'edit'])->name('ruangan.edit');
-    Route::put('/ruangan/{id}', [RuanganController::class, 'update'])->name('ruangan.update');
-    Route::delete('/ruangan/{id}', [RuanganController::class, 'destroy'])->name('ruangan.destroy');
+    // Route Download Proposal (bisa diakses siapa saja yang login)
+    Route::get('/event/download/{id}', [ApprovalController::class, 'downloadProposal'])->name('event.download');
 
-    // Route Master Event
-    Route::get('/event', [EventController::class, 'index'])->name('event.index');
-    Route::post('/event', [EventController::class, 'store'])->name('event.store');
-    Route::get('/event/{id}/edit', [EventController::class, 'edit'])->name('event.edit');
-    Route::put('/event/{id}', [EventController::class, 'update'])->name('event.update');
-    Route::delete('/event/{id}', [EventController::class, 'destroy'])->name('event.destroy');
+    // SEKJUR
+    Route::middleware('role:sekjur')->group(function () {
+        Route::resources([
+            'prodi'   => ProdiController::class,
+            'ruangan' => RuanganController::class,
+            'event'   => EventController::class,
+        ]);
+        Route::get('/sekjur/endorsement', [ApprovalController::class, 'sekjurIndex'])->name('sekjur.endorsement');
+        Route::post('/sekjur/endorsement/{id}', [ApprovalController::class, 'sekjurProcess'])->name('sekjur.endorsement.process');
+        Route::get('/reports/rekapitulasi', [ReportController::class, 'rekapEvent'])->name('reports.rekap');
+    });
 
-    // Route Presensi Mahasiswa
-    Route::get('/presensi', [PresensiController::class, 'index'])->name('presensi.index');
+    // HIMA
+    Route::middleware('role:hima')->group(function () {
+        Route::get('/hima/pengajuan', [EventController::class, 'himaCreate'])->name('hima.pengajuan.create');
+        Route::post('/hima/pengajuan', [EventController::class, 'himaStore'])->name('hima.pengajuan.store');
+        Route::get('/tracking-status', [EventController::class, 'trackingStatus'])->name('tracking.status');
+        Route::post('/hima/upload-lhk/{id}', [EventController::class, 'uploadLhk'])->name('hima.upload_lhk');
+    });
+
+    // KAPRODI
+    Route::middleware('role:kaprodi')->group(function () {
+        Route::get('/kaprodi/review', [ApprovalController::class, 'kaprodiIndex'])->name('kaprodi.review');
+        Route::get('/kaprodi/dashboard', [ApprovalController::class, 'kaprodiIndex'])->name('kaprodi.dashboard');
+        Route::post('/kaprodi/review/process/{id}', [ApprovalController::class, 'kaprodiProcess'])->name('kaprodi.review.process');
+    });
+
+    // DEKAN
+    Route::middleware('role:dekan')->group(function () {
+        Route::get('/dekan/approval', [ApprovalController::class, 'dekanIndex'])->name('dekan.dashboard');
+        Route::get('/dekan/approval', [ApprovalController::class, 'dekanIndex'])->name('dekan.approval');
+        Route::post('/dekan/approval/{id}', [ApprovalController::class, 'dekanProcess'])->name('dekan.approval.process');
+        Route::post('/dekan/lhk/process/{id}', [ApprovalController::class, 'dekanLhkProcess'])->name('dekan.lhk.process');
+    });
 });

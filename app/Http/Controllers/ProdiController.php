@@ -7,8 +7,12 @@ use Illuminate\Http\Request;
 
 class ProdiController extends Controller
 {
-    public function index() {
-        $prodis = Prodi::all();
+    public function index()
+    {
+        // TARIK SEMUA DATA DARI DATABASE
+        $prodis = Prodi::all(); 
+        
+        // KIRIM KE VIEW
         return view('prodi.index', compact('prodis'));
     }
 

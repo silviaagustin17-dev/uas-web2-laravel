@@ -18,6 +18,7 @@
                     <span class="badge bg-secondary p-2">Sistem Manajemen Event Fakultas</span>
                 </div>
 
+                <!-- Form Tambah Event -->
                 <div class="card shadow border-0 mb-4">
                     <div class="card-header bg-primary text-white py-3">
                         <h5 class="mb-0"><i class="fa-solid fa-plus me-2"></i> Tambah Event Baru</h5>
@@ -48,6 +49,7 @@
                     </div>
                 </div>
 
+                <!-- Tabel Data Event -->
                 <div class="card shadow border-0">
                     <div class="card-body p-4">
                         <table class="table table-bordered table-striped align-middle mb-0">
@@ -62,38 +64,33 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if(count($events) > 0)
-                                    @foreach($events as $key => $item)
-                                    <tr>
-                                        <td>{{ $key + 1 }}</td>
-                                        <td class="fw-bold text-secondary">{{ $item->nama_event }}</td>
-                                        <td>{{ $item->tanggal }}</td>
-                                        <td><span class="badge bg-info text-dark">{{ $item->lokasi }}</span></td>
-                                        <td>{{ $item->deskripsi }}</td>
-                                        <td class="text-center">
-                                            <div class="d-flex gap-2 justify-content-center">
-                                                <a href="{{ route('event.edit', $item->id) }}" class="btn btn-warning btn-sm text-white">Edit</a>
-                                                <form action="{{ route('event.destroy', $item->id) }}" method="POST">
-                                                    @csrf 
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin mau hapus?')">
-                                                        Hapus
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                @else
-                                    <tr>
-                                        <td colspan="6" class="text-center py-4 text-muted">Belum ada data master event. Silakan tambah data di atas!</td>
-                                    </tr>
-                                @endif
+                                @forelse($events as $key => $item)
+                                <tr>
+                                    <td>{{ $key + 1 }}</td>
+                                    <td class="fw-bold text-secondary">{{ $item->nama_event }}</td>
+                                    <td>{{ $item->tanggal }}</td>
+                                    <td><span class="badge bg-info text-dark">{{ $item->lokasi }}</span></td>
+                                    <td>{{ $item->deskripsi }}</td>
+                                    <td class="text-center">
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <a href="{{ route('event.edit', $item->id) }}" class="btn btn-warning btn-sm text-white">Edit</a>
+                                            <form action="{{ route('event.destroy', $item->id) }}" method="POST">
+                                                @csrf 
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin mau hapus?')">Hapus</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">Belum ada data master event. Silakan tambah data di atas!</td>
+                                </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

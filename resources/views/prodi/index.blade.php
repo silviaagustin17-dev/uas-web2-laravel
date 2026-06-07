@@ -57,37 +57,32 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @if(count($prodis) > 0)
-                                    @foreach($prodis as $key => $item)
-                                    <tr>
-                                        <td>{{ $key + 1 }}</td>
-                                        <td class="fw-bold text-secondary">{{ $item->nama_prodi }}</td>
-                                        <td><span class="badge bg-info text-dark">{{ $item->kode_prodi }}</span></td>
-                                        <td class="text-primary fw-bold">{{ $item->kepala_prodi }}</td>
-                                        <td class="text-center">
-                                            <div class="d-flex gap-2 justify-content-center">
-                                                <a href="{{ route('prodi.edit', $item->id) }}" class="btn btn-warning btn-sm text-white">Edit</a>
-                                                <form action="{{ route('prodi.destroy', $item->id) }}" method="POST">
-                                                    @csrf 
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus prodi ini?')">
-                                                        Hapus
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                @else
-                                    <tr>
-                                        <td colspan="5" class="text-center py-4 text-muted">Belum ada data master prodi. Silakan tambah data di atas!</td>
-                                    </tr>
-                                @endif
+                                @forelse($prodis as $key => $item)
+                                <tr>
+                                    <td>{{ $key + 1 }}</td>
+                                    <td class="fw-bold text-secondary">{{ $item->nama_prodi }}</td>
+                                    <td><span class="badge bg-info text-dark">{{ $item->kode_prodi }}</span></td>
+                                    <td class="text-primary fw-bold">{{ $item->kepala_prodi }}</td>
+                                    <td class="text-center">
+                                        <div class="d-flex gap-2 justify-content-center">
+                                            <a href="{{ route('prodi.edit', $item->id) }}" class="btn btn-warning btn-sm text-white">Edit</a>
+                                            <form action="{{ route('prodi.destroy', $item->id) }}" method="POST">
+                                                @csrf 
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus prodi ini?')">Hapus</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">Belum ada data master prodi. Silakan tambah data di atas!</td>
+                                </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

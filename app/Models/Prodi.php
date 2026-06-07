@@ -7,8 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Prodi extends Model
 {
-    use HasFactory;
-    
-    // Pastikan kepala_prodi sudah didaftarkan di sini
-    protected $fillable = ['nama_prodi', 'kode_prodi', 'kepala_prodi'];
+    // Ini kuncinya: Menentukan tabel mana yang ditarik
+    protected $table = 'prodis'; 
+    protected $fillable = ['nama_prodi', 'kode_prodi'];
 }

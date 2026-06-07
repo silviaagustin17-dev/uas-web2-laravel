@@ -14,9 +14,14 @@ return new class extends Migration
     Schema::create('events', function (Blueprint $table) {
         $table->id();
         $table->string('nama_event');
-        $table->date('tanggal');
-        $table->string('lokasi');
-        $table->text('deskripsi');
+        $table->string('draft_proposal');
+        $table->string('status')->default('Pending Sekjur');
+        $table->text('catatan')->nullable();
+        
+        // TAMBAHKAN DUA BARIS BARU INI UNTUK LHK:
+        $table->string('file_lhk')->nullable(); // Menyimpan file LHK dari HIMA
+        $table->string('status_lhk')->nullable(); // Status: Pending LHK / Direvisi / Diterima
+        
         $table->timestamps();
     });
 }
